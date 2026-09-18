@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LinkedIn AutoConnect Pro</title>
+  <link rel="stylesheet" href="popup.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="app">
+    <!-- Header -->
+    <header class="header">
+      <div class="header-brand">
+        <div class="logo-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/>
+            <rect x="2" y="9" width="4" height="12"/>
+            <circle cx="4" cy="4" r="2"/>
+          </svg>
+        </div>
+        <div>
+          <h1 class="header-title">AutoConnect Pro</h1>
+          <span class="header-badge">LinkedIn Automation</span>
+        </div>
+      </div>
+      <div class="daily-counter" id="dailyCounter">
+        <span class="counter-value" id="todayCount">0</span>
+        <span class="counter-label">/ <span id="dailyLimitDisplay">25</span> today</span>
+      </div>
+    </header>
+
+    <!-- Tabs -->
+    <nav class="tabs">
+      <button class="tab active" data-tab="queue">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        Queue
+      </button>
+      <button class="tab" data-tab="progress">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        Live
+      </button>
+      <button class="tab" data-tab="history">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        History
+      </button>
+      <button class="tab" data-tab="settings">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        Settings
+      </button>
+    </nav>
+
+    <!-- Queue Tab -->
+    <div class="tab-content active" id="tab-queue">
+      <div class="input-group">
+        <label class="input-label">
+          Paste LinkedIn Profile URLs
+          <span class="url-count" id="urlCount">0 URLs detected</span>
+        </label>
+        <textarea id="urlInput" class="url-textarea" placeholder="Paste LinkedIn URLs here (one per line)&#10;&#10;https://linkedin.com/in/john-doe&#10;https://linkedin.com/in/jane-smith&#10;https://linkedin.com/in/example-user"></textarea>
+      </div>
+
+      <div class="action-row">
+        <div class="action-select-group">
+          <label class="input-label">Action</label>
+          <select id="actionType" class="action-select">
+            <option value="follow">Follow Only</option>
+            <option value="connect">Connect (No Note)</option>
+            <option value="connect_note">Connect + Note</option>
+          </select>
+        </div>
+        <div class="action-select-group" id="noteGroup" style="display:none;">
+          <label class="input-label">Note Message</label>
+          <input type="text" id="connectNote" class="note-input" placeholder="Hi, let's connect!" maxlength="300">
+        </div>
+      </div>
+
+      <div class="control-buttons">
+        <button class="btn btn-primary" id="btnStart">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          Start
+        </button>
+        <button class="btn btn-warning" id="btnPause" disabled>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+          Pause
+        </button>
+        <button class="btn btn-danger" id="btnStop" disabled>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><rect x="4" y="4" width="16" height="16" rx="2"/></svg>
+          Stop
+        </button>
+      </div>
+    </div>
+
+    <!-- Progress Tab -->
+    <div class="tab-content" id="tab-progress">
+      <div class="progress-stats">
+        <div class="stat-card stat-total">
+          <span class="stat-number" id="statTotal">0</span>
+          <span class="stat-label">Total</span>
+        </div>
+        <div class="stat-card stat-done">
+          <span class="stat-number" id="statDone">0</span>
+          <span class="stat-label">Done</span>
+        </div>
+        <div class="stat-card stat-skip">
+          <span class="stat-number" id="statSkipped">0</span>
+          <span class="stat-label">Skipped</span>
+        </div>
+        <div class="stat-card stat-fail">
+          <span class="stat-number" id="statFailed">0</span>
+          <span class="stat-label">Failed</span>
+        </div>
+      </div>
+
+      <div class="progress-bar-container">
+        <div class="progress-bar" id="progressBar" style="width: 0%"></div>
+      </div>
+
+      <div class="current-status" id="currentStatus">
+        <div class="status-dot idle"></div>
+        <span>Idle — Waiting to start</span>
+      </div>
+
+      <div class="live-log" id="liveLog">
+        <div class="log-entry log-info">Extension ready. Paste URLs and click Start.</div>
+      </div>
+    </div>
+
+    <!-- History Tab -->
+    <div class="tab-content" id="tab-history">
+      <div class="history-header">
+        <h3 class="section-title">Processed Profiles</h3>
+        <button class="btn btn-sm btn-outline" id="btnExportCSV">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Export CSV
+        </button>
+      </div>
+      <div class="history-list" id="historyList">
+        <div class="empty-state">No profiles processed yet.</div>
+      </div>
+      <button class="btn btn-sm btn-outline btn-full" id="btnClearHistory" style="margin-top:8px;">Clear History</button>
+    </div>
+
+    <!-- Settings Tab -->
+    <div class="tab-content" id="tab-settings">
+      <div class="settings-group">
+        <label class="input-label">Daily Limit (Max Connections/Day)</label>
+        <input type="range" id="dailyLimit" class="range-slider" min="5" max="50" value="25">
+        <div class="range-labels">
+          <span>5 (Ultra Safe)</span>
+          <span id="dailyLimitValue">25</span>
+          <span>50 (Risky)</span>
+        </div>
+      </div>
+
+      <div class="settings-group">
+        <label class="input-label">Delay Between Profiles (seconds)</label>
+        <input type="range" id="delayRange" class="range-slider" min="20" max="90" value="40">
+        <div class="range-labels">
+          <span>20s (Fast)</span>
+          <span id="delayValue">40s</span>
+          <span>90s (Stealth)</span>
+        </div>
+      </div>
+
+      <div class="settings-group">
+        <label class="input-label">Random Jitter (± seconds)</label>
+        <input type="range" id="jitterRange" class="range-slider" min="0" max="30" value="15">
+        <div class="range-labels">
+          <span>0s</span>
+          <span id="jitterValue">±15s</span>
+          <span>±30s</span>
+        </div>
+      </div>
+
+      <div class="settings-info">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+        <span>Effective rate: <strong id="effectiveRate">~1.2/min</strong> • Session will mimic natural human browsing patterns.</span>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <span>⚡ LinkedIn AutoConnect Pro v1.0</span>
+      <span class="footer-status" id="footerStatus">Ready</span>
+    </footer>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

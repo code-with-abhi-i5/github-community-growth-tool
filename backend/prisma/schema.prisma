@@ -1,0 +1,111 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             String   @id @default(cuid())
+  githubId       String   @unique
+  githubUsername String
+  avatarUrl      String?
+  accessToken    String   // Stored server-side only, never exposed to frontend
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  jobs           Job[]
+  scannedUsers   ScannedUser[]
+}
+
+model ScannedUser {
+  id                  String    @id @default(cuid())
+  userId              String
+  user                User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  username            String
+  name                String?
+  avatarUrl           String?
+  bio                 String?
+  location            String?
+  company             String?
+  blog                String?
+  githubUrl           String
+  createdAt           String?   // GitHub account creation timestamp
+  accountAgeYears     Float     @default(0)
+  profileCompleteness Int       @default(0)
+
+  // Network
+  followersCount      Int       @default(0)
+  followingCount      Int       @default(0)
+  followersRatio      Float     @default(0)
+  isMutualFollowing   Boolean   @default(false)
+
+  // Repositories & Quality
+  publicReposCount    Int       @default(0)
+  originalReposCount  Int       @default(0)
+  forkedReposCount    Int       @default(0)
+  totalStarsCount     Int       @default(0)
+
+  // Activity
+  lastActiveAt        String?
+  lastActiveFormatted String    @default("Never")
+  lastActionSummary   String    @default("")
+  daysSinceActive     Int?
+  activityStatus      String    // 'SUPER_ACTIVE' | 'ACTIVE' | 'OCCASIONAL' | 'INACTIVE'
+  activityScore       Int       @default(0)
+  developerTag        String    @default("Dormant Account")
+  recentEventsCount   Int       @default(0)
+
+  scannedAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  @@unique([userId, username])
+  @@index([userId])
+  @@index([userId, activityStatus])
+  @@index([userId, activityScore])
+}
+
+model Job {
+  id                    String    @id @default(cuid())
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id])
+  status                String    @default("PENDING")
+  fileName              String?
+  totalCount            Int       @default(0)
+  pendingCount          Int       @default(0)
+  processingCount       Int       @default(0)
+  followedCount         Int       @default(0)
+  alreadyFollowingCount Int       @default(0)
+  failedCount           Int       @default(0)
+  notFoundCount         Int       @default(0)
+  rateLimitedCount      Int       @default(0)
+  createdAt             DateTime  @default(now())
+  startedAt             DateTime?
+  completedAt           DateTime?
+  updatedAt             DateTime  @updatedAt
+  items                 JobItem[]
+
+  @@index([userId])
+  @@index([status])
+}
+
+model JobItem {
+  id          String    @id @default(cuid())
+  jobId       String
+  job         Job       @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  username    String
+  status      String    @default("PENDING")
+  attempts    Int       @default(0)
+  message     String?
+  processedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([jobId])
+  @@index([jobId, status])
+  @@index([status])
+}
